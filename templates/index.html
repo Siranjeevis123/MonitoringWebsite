@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>System Monitoring</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        .plotly-graph-div {
+            margin: auto;
+            width: 50%;
+            background-color: rgba(151, 128, 128, 0.688);
+            padding: 20px;
+        }
+        
+        .fade-in {
+            animation: fade-in 1s ease-in-out;
+        }
+        
+        @keyframes fade-in {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        
+        ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        li {
+            margin: 10px;
+            padding: 10px;
+            background-color: #f2f2f2;
+            border-radius: 5px;
+            animation: slide-up 0.5s ease-in-out;
+        }
+        
+        @keyframes slide-up {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        h2 {
+            color: #1f77b4;
+        }
+        
+        .system-info {
+            font-weight: bold;
+            color: black;
+            transition: color 0.3s;
+        }
+        
+        .system-info:hover {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container fade-in">
+        <h1>System Monitoring</h1>
+        <div id="cpu-gauge"></div>
+        <div id="mem-gauge"></div>
+        <div>
+            <p class="system-info">Battery Percentage: <span>{{ battery_percent }}%</span></p>
+            <p class="system-info">Wi-Fi Status: <span>{{ wifi_status }}</span></p>
+            <p class="system-info">Wi-Fi Speed: <span>{{ wifi_speed }}</span></p>
+            <p class="system-info">Current Time: <span>{{ current_time }}</span></p>
+            <p class="system-info">Current Date: <span>{{ current_date }}</span></p>
+            <p class="system-info">macOS Version: <span>{{ mac_version }}</span></p>
+            <p class="system-info">Free Memory: <span>{{ free_memory }} bytes</span></p>
+        </div>
+        <div>
+            <h2>Running Applications</h2>
+            <ul>
+                {% for app in running_apps %}
+                    <li class="slide-up">{{ app['name'] }} (PID: {{ app['pid'] }})<br>Usage Duration: {{ app['create_time'] }}<br>Command to Terminate: {{ app['command'] }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div>
+            <h2>Used Ports</h2>
+            <ul>
+                {% for port in used_ports %}
+                    <li class="slide-up">Port: {{ port['port'] }} (PID: {{ port['pid'] }})<br>Process Name: {{ port['process_name'] }}<br>Command to Terminate: {{ port['command'] }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <!-- Rest of the HTML code -->
+    </div>
+    <script>
+        var cpuGauge = {
+            type: "indicator",
+            mode: "gauge+number",
+            value: {{ cpu_metric }},
+            gauge: {
+                axis: { range: [null, 100] },
+                bar: { color: "#1f77b4" },
+                bgcolor: "white",
+                borderwidth: 2,
+                bordercolor: "#ccc",
+                steps: [
+                    { range: [0, 50], color: "#d9f0a3" },
+                    { range: [50, 85], color: "#ffeb84" },
+                    { range: [85, 100], color: "#ff5f5f" }
+                ],
+                threshold: {
+                    line: { color: "red", width: 4 },
+                    thickness: 0.75,
+                    value: {{ cpu_metric }}
+                }
+            }
+        };
+        
+        var memGauge = {
+            type: "indicator",
+            mode: "gauge+number",
+            value: {{ mem_metric }},
+            gauge: {
+                axis: { range: [null, 100] },
+                bar: { color: "#1f77b4" },
+                bgcolor: "white",
+                borderwidth: 2,
+                bordercolor: "#ccc",
+                steps: [
+                    { range: [0, 50], color: "#d9f0a3" },
+                    { range: [50, 85], color: "#ffeb84" },
+                    { range: [85, 100], color: "#ff5f5f" }
+                ],
+                threshold: {
+                    line: { color: "red", width: 4 },
+                    thickness: 0.75,
+                    value: {{ mem_metric }}
+                }
+            }
+        };
+        
+        var cpuGaugeLayout = { title: "CPU Utilization" };
+        var memGaugeLayout = { title: "Memory Utilization" };
+        
+        Plotly.newPlot('cpu-gauge', [cpuGauge], cpuGaugeLayout);
+        Plotly.newPlot('mem-gauge', [memGauge], memGaugeLayout);
+    </script>
+</body>
+</html>
