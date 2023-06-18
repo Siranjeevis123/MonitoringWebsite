@@ -15,3 +15,6 @@ git remote -v
 git remote remove origin
 git remote add origin git@github.com:Siranjeevis123/Monitoring.git
 git push -u origin master
+
+# main cmt
+sudo python3 app.py
